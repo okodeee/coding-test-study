@@ -2,6 +2,9 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+    static char[][] field = new char[3][3];
+    static int xCount, oCount;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
@@ -9,9 +12,8 @@ public class Main {
         String input;
         while (!(input = br.readLine()).equals("end")) {
 
-            char[][] field = new char[3][3];
-            int xCount = 0;
-            int oCount = 0;
+            xCount = 0;
+            oCount = 0;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     field[i][j] = input.charAt(3 * i + j);
@@ -23,64 +25,80 @@ public class Main {
                 }
             }
 
-            // X 개수가 O보다 하나 많거나 같다.
-            if (!(xCount == oCount || xCount == oCount + 1)) {
+            if (isValid()) {
+                sb.append("valid\n");
+            } else {
                 sb.append("invalid\n");
-                continue;
             }
-
-            // 우승은 하나만
-            boolean xWin = isXWin(field);
-            boolean oWin = isOWin(field);
-
-            if (xWin && oWin) {
-                sb.append("invalid\n");
-                continue;
-            } else if (xWin && (xCount <= oCount)) {
-                sb.append("invalid\n");
-                continue;
-            } else if (oWin && (xCount != oCount)) {
-                sb.append("invalid\n");
-                continue;
-            } else if (!oWin && !xWin && xCount != 5 && oCount != 4) {
-                sb.append("invalid\n");
-                continue;
-            }
-
-            sb.append("valid\n");
         }
 
         System.out.println(sb);
     }
 
-    static boolean isXWin(char[][] field) {
-        if (field[0][0] == 'X') {
-            if (field[0][1] == 'X' && field[0][2] == 'X') return true;
-            if (field[1][1] == 'X' && field[2][2] == 'X') return true;
-            if (field[1][0] == 'X' && field[2][0] == 'X') return true;
+    private static boolean isValid() {
+        // X 개수가 O보다 하나 많거나 같다.
+        if (!(xCount == oCount || xCount == oCount + 1)) {
+            return false;
         }
 
-        if (field[0][1] == 'X' && field[1][1] == 'X' && field[2][1] == 'X') return true;
-        if (field[0][2] == 'X' && field[1][2] == 'X' && field[2][2] == 'X') return true;
-        if (field[1][0] == 'X' && field[1][1] == 'X' && field[1][2] == 'X') return true;
-        if (field[2][0] == 'X' && field[2][1] == 'X' && field[2][2] == 'X') return true;
-        if (field[0][2] == 'X' && field[1][1] == 'X' && field[2][0] == 'X') return true;
+        boolean xWin = won('X');
+        boolean oWin = won('O');
 
-        return false;
+        // 우승은 하나만
+        if (xWin && oWin) {
+            return false;
+        }
+
+        // X가 이겼다면 X 개수가 O 보다 하나 많다.
+        if (xWin && (xCount <= oCount)) {
+            return false;
+        }
+
+        // O가 이겼다면 X 개수와 같다.
+        if (oWin && (xCount != oCount)) {
+            return false;
+        }
+
+        // 아무도 안 이겼다면 게임판이 꽉 차야한다.
+        if (!oWin && !xWin && xCount + oCount != 9) {
+            return false;
+        }
+
+        return true;
     }
 
-    static boolean isOWin(char[][] field) {
-        if (field[0][0] == 'O') {
-            if (field[0][1] == 'O' && field[0][2] == 'O') return true;
-            if (field[1][1] == 'O' && field[2][2] == 'O') return true;
-            if (field[1][0] == 'O' && field[2][0] == 'O') return true;
+    static boolean won(char player) {
+        // 가로
+        for (int i = 0; i < 3; i++) {
+            if (field[i][0] == player &&
+                field[i][1] == player &&
+                field[i][2] == player) {
+                return true;
+            }
         }
 
-        if (field[0][1] == 'O' && field[1][1] == 'O' && field[2][1] == 'O') return true;
-        if (field[0][2] == 'O' && field[1][2] == 'O' && field[2][2] == 'O') return true;
-        if (field[1][0] == 'O' && field[1][1] == 'O' && field[1][2] == 'O') return true;
-        if (field[2][0] == 'O' && field[2][1] == 'O' && field[2][2] == 'O') return true;
-        if (field[0][2] == 'O' && field[1][1] == 'O' && field[2][0] == 'O') return true;
+        // 세로
+        for (int j = 0; j < 3; j++) {
+            if (field[0][j] == player &&
+                field[1][j] == player &&
+                field[2][j] == player) {
+                return true;
+            }
+        }
+
+        // 대각선 ↘
+        if (field[0][0] == player &&
+            field[1][1] == player &&
+            field[2][2] == player) {
+            return true;
+        }
+
+        // 대각선 ↙
+        if (field[0][2] == player &&
+            field[1][1] == player &&
+            field[2][0] == player) {
+            return true;
+        }
 
         return false;
     }
