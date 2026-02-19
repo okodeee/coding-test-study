@@ -6,31 +6,25 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int N = Integer.parseInt(br.readLine());
-
-        int[] nums = new int[N];
+        int[] el = new int[N];
         for (int i = 0; i < N; i++) {
-            nums[i] = Integer.parseInt(br.readLine());
+            el[i] = Integer.parseInt(br.readLine());
         }
+        Arrays.sort(el);
 
-        Arrays.sort(nums);
-
-        // 두 수의 합을 Set에 저장
-        Set<Integer> sumSet = new HashSet<>();
+        // x + y 조합 미리 넣어놓기
+        Set<Integer> set = new HashSet<>();
         for (int i = 0; i < N; i++) {
-            for (int j = i; j < N; j++) {
-                sumSet.add(nums[i] + nums[j]);
+            for (int j = 0; j <= i; j++) {
+                set.add(el[i] + el[j]);
             }
         }
 
-        // 큰 수부터 확인 (최댓값을 찾아야 하므로)
-        for (int k = N - 1; k >= 0; k--) {
-            for (int c = 0; c < N; c++) {
-                // nums[k] = (a + b) + nums[c]
-                // → (a + b) = nums[k] - nums[c] 인지 확인
-                int target = nums[k] - nums[c];
-
-                if (sumSet.contains(target)) {
-                    System.out.println(nums[k]);
+        // k 최댓값 찾기
+        for (int i = N - 1; i >= 0; i--) {
+            for (int j = 0; j <= i; j++) {
+                if (set.contains(el[i] - el[j])) {
+                    System.out.println(el[i]);
                     return;
                 }
             }
