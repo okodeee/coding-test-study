@@ -6,44 +6,53 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int num = Integer.parseInt(st.nextToken());
-        int cap = Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
-        List<Integer> pos = new ArrayList<>();
-        List<Integer> neg = new ArrayList<>();
+        int[] books = new int[N];
         st = new StringTokenizer(br.readLine());
-        int max = 0;  // 가장 먼 거리 (마지막에 가면 안 돌아옴)
+        for (int i = 0; i < N; i++) {
+            books[i] = Integer.parseInt(st.nextToken());
+        }
 
-        for (int i = 0; i < num; i++) {
-            int position = Integer.parseInt(st.nextToken());
-            max = Math.max(max, Math.abs(position));
+        Arrays.sort(books);
 
-            if (position > 0) {
-                pos.add(position);
-            } else {
-                neg.add(Math.abs(position));  // 절댓값으로
+        // 음수 위치 책 정돈
+        int result = 0;
+        int index = 0;
+        int organized = 0;
+        while (books[index] < 0) {
+            result += Math.abs(books[index]) * 2;
+
+            int i = M;
+            while (index < N && i-- > 0 && books[index] < 0) {
+                index++;
+                organized++;
+            }
+
+            if (organized == N) {
+                result -= Math.abs(books[0]);
+                System.out.println(result);
+                return;
             }
         }
 
-        // 내림차순 정렬 (먼 곳부터)
-        Collections.sort(pos, Collections.reverseOrder());
-        Collections.sort(neg, Collections.reverseOrder());
+        // 양수 위치 책 정돈
+        index = N - 1;
+        while (books[index] > 0) {
+            result += books[index] * 2;
 
-        int result = 0;
+            int i = M;
+            while (index >= 0 && i-- > 0 && books[index] > 0) {
+                index--;
+                organized++;
+            }
 
-        // 음수 위치 처리
-        for (int i = 0; i < neg.size(); i += cap) {
-            result += neg.get(i) * 2;
+            if (organized == N) {
+                result -= Math.max(Math.abs(books[0]), Math.abs(books[N - 1]));
+                System.out.println(result);
+                return;
+            }
         }
-
-        // 양수 위치 처리
-        for (int i = 0; i < pos.size(); i += cap) {
-            result += pos.get(i) * 2;
-        }
-
-        // 가장 먼 곳은 마지막에 가므로 돌아올 필요 없음
-        result -= max;
-
-        System.out.println(result);
     }
 }
