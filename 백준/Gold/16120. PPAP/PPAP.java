@@ -1,40 +1,38 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String str = br.readLine();
 
-        Stack<Character> stack = new Stack<>();
-        for (int i = 0; i < str.length(); i++) {
-            stack.push(str.charAt(i));
+        String input = br.readLine();
 
-            if (stack.size() >= 4) {
-                char fourth = stack.pop();
-                char third = stack.pop();
-                char second = stack.pop();
-                char first = stack.pop();
+        Stack<Character> st = new Stack<>();
+        for (int i = 0; i < input.length(); i++) {
+            st.push(input.charAt(i));
+
+            if (st.size() >= 4) {
+                char fourth = st.pop();
+                char third = st.pop();
+                char second = st.pop();
+                char first = st.pop();
 
                 if (first == 'P' && second == 'P' && third == 'A' && fourth == 'P') {
-                    stack.push('P');
+                    st.push('P');
                 } else {
-                    stack.push(first);
-                    stack.push(second);
-                    stack.push(third);
-                    stack.push(fourth);
+                    st.push(first);
+                    st.push(second);
+                    st.push(third);
+                    st.push(fourth);
                 }
             }
         }
 
-        if (stack.size() == 1 && stack.peek() == 'P') {
+        if (st.size() == 1 && st.peek() == 'P') {
             System.out.println("PPAP");
             return;
         }
 
         System.out.println("NP");
-        return;
-
     }
 }
