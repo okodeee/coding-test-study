@@ -1,34 +1,31 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
         int N = Integer.parseInt(st.nextToken());
         int C = Integer.parseInt(st.nextToken());
 
-        int[] houses = new int[N];
+        int[] house = new int[N];
         for (int i = 0; i < N; i++) {
-            houses[i] = Integer.parseInt(br.readLine());
+            house[i] = Integer.parseInt(br.readLine());
         }
 
-        Arrays.sort(houses);
+        Arrays.sort(house);
 
         // 공유기 사이의 최소 거리를 이분 탐색
-        int left = 1;   // 한 집에는 공유기를 하나만 설치
-        int right = houses[N - 1] - houses[0];  // 가장 먼 집 - 가장 가까운 집
+        int left = 1;
+        int right = house[N - 1] - house[0];  // 가장 먼 집 - 가장 가까운 집
         int answer = 0;
 
         while (left <= right) {
             int mid = (left + right) / 2;
 
-            if (canInstall(houses, C, mid)) {
+            if (canInstall(house, C, mid)) {
                 answer = mid;
-                left = mid + 1; // 더 먼 거리로 다시 시도
+                left = mid + 1; // 더 먼 거리로
             } else {
                 right = mid - 1;
             }
