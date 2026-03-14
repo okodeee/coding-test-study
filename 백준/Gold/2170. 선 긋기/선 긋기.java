@@ -1,61 +1,42 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
-    static class Line {
-        int start;
-        int end;
-
-        Line(int start, int end) {
-            this.start = start;
-            this.end = end;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int N = Integer.parseInt(br.readLine());
+        StringTokenizer st;
 
-        List<Line> lines = new ArrayList<>();
-
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int x = Integer.parseInt(st.nextToken());
-            int y = Integer.parseInt(st.nextToken());
-            lines.add(new Line(x, y));
-        }
-
-        // 시작점 기준 오름차순 정렬
-        lines.sort((o1, o2) -> {
-            if (o1.start == o2.start) {
-                return o1.end - o2.end;
-            }
-            return o1.start - o2.start;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> {
+            if (a[0] == b[0]) return a[1] = b[1];
+            return a[0] - b[0];
         });
 
-        long length = 0;
-        int currentStart = lines.get(0).start;
-        int currentEnd = lines.get(0).end;
+        int N = Integer.parseInt(br.readLine());
+        while (N-- > 0) {
+            st = new StringTokenizer(br.readLine());
+            int x = Integer.parseInt(st.nextToken());
+            int y = Integer.parseInt(st.nextToken());
 
-        // 구간 합치기
-        for (int i = 1; i < N; i++) {
-            Line line = lines.get(i);
-
-            // 겹치거나 연결되는 경우
-            if (line.start <= currentEnd) {
-                currentEnd = Math.max(currentEnd, line.end);
-            }
-            // 떨어진 구간인 경우
-            else {
-                length += (currentEnd - currentStart);
-                currentStart = line.start;
-                currentEnd = line.end;
-            }
+            pq.offer(new int[] { x, y });
         }
 
-        // 마지막 구간 추가
-        length += (currentEnd - currentStart);
+        int[] line = pq.poll();
+        int length = line[1] - line[0];
+        int curr = line[1];
+
+        while (!pq.isEmpty()) {
+            line = pq.poll();
+
+            if (line[1] > curr) {
+                if (line[0] > curr) {
+                    length += (line[1] - line[0]);
+                } else {
+                    length += (line[1] - curr);
+                }
+
+                curr = line[1];
+            }
+        }
 
         System.out.println(length);
     }
