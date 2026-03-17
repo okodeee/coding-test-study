@@ -5,31 +5,24 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         int N = Integer.parseInt(st.nextToken());
-        int K = Integer.parseInt(st.nextToken());
+        long K = Long.parseLong(st.nextToken());
 
-        int[] nums = new int[N];
+        long[] arr = new long[N + 1];
         st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            nums[i] = Integer.parseInt(st.nextToken());
+        for (int i = 1; i <= N; i++) {
+            arr[i] = arr[i - 1] + Long.parseLong(st.nextToken());
         }
 
-        Map<Long, Long> prefixSumCount = new HashMap<>();
-        prefixSumCount.put(0L, 1L);   // 아무것도 선택 안한 경우
+        HashMap<Long, Long> map = new HashMap<>();
+        long count = 0;
 
-        long sum = 0;    // 현재까지 누적합
-        long count = 0;  // 결과
-
-        for (int i = 0; i < N; i++) {
-            sum += nums[i];
-
-            if (prefixSumCount.containsKey(sum - K)) {
-                count += prefixSumCount.get(sum - K);
-            }
-
-            // 현재 누적합을 HashMap에 저장
-            prefixSumCount.put(sum, prefixSumCount.getOrDefault(sum, 0L) + 1);
+        for (int i = 0; i <= N; i++) {
+            count += map.getOrDefault(arr[i] - K, 0L);
+            map.put(arr[i], map.getOrDefault(arr[i], 0L) + 1);
         }
+
         System.out.println(count);
     }
 }
