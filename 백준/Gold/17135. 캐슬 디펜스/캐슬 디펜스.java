@@ -3,8 +3,7 @@ import java.util.*;
 
 public class Main {
     static int N, M, D;
-    static int E = 0;
-    static boolean[][] board;
+    static int[][] board;
     static int[] dx = new int[] { 0, -1, 0 };
     static int[] dy = new int[] { -1, 0, 1 };
     static int result = 0;
@@ -17,111 +16,93 @@ public class Main {
         M = Integer.parseInt(st.nextToken());
         D = Integer.parseInt(st.nextToken());
 
-        board = new boolean[N + 1][M];
+        board = new int[N][M];
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < M; j++) {
-                board[i][j] = Integer.parseInt(st.nextToken()) != 0;
-                if (board[i][j]) E++;
+                board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        // 궁수 3명 배치
-        archer(0, 0, new boolean[M]);
+        // 궁수 3명 배치 (M개 중 3개 선택)
+        archer(0, 0, new int[3]);
 
         System.out.println(result);
     }
 
-    static void archer(int depth, int start, boolean[] position) {
-        if (depth >= 3) {
-            // 제거할 수 있는 적 수 구하기
-            result = Math.max(result, playing(position));
-
+    static void archer(int depth, int start, int[] archers) {
+        if (depth == 3) {
+            result = Math.max(result, playing(archers));
             return;
         }
 
-        for (int i = start; i < position.length; i++) {
-            position[i] = true;
-            archer(depth + 1, i + 1, position);
-            position[i] = false;
+        for (int i = start; i < M; i++) {
+            archers[depth] = i;
+            archer(depth + 1, i + 1, archers);
         }
     }
 
-    static int playing(boolean[] position) {
-        boolean[][] curr = new boolean[N][M];
-
+    static int playing(int[] archers) {
+        int[][] map = new int[N][M];
         for (int i = 0; i < N; i++) {
-            curr[i] = board[i].clone();
+            map[i] = board[i].clone();
         }
 
-        int remain = E;
-        int dead = 0;
-        List<int[]> attacked;
+        int killCount = 0;
 
-        while (remain > 0) {
-            attacked = new ArrayList<>();
+        for (int turn = 0; turn < N; turn++) {
+            List<int[]> targets = new ArrayList<>();
 
-            for (int k = 0; k < position.length; k++) {
-                if (position[k] == true) {
-
-                    boolean[][] visited = new boolean[N][M];
-                    Queue<int[]> q = new LinkedList<>();
-                    q.offer(new int[] { N - 1, k });
-
-                    while (!q.isEmpty()) {
-                        int[] currNode = q.poll();
-
-                        if (curr[currNode[0]][currNode[1]]) {
-                            // 몬스터가 있다면 공격
-                            attacked.add(new int[]{ currNode[0], currNode[1] });
-                            break;
-                        }
-
-                        for (int i = 0; i < 3; i++) {
-                            int nx = currNode[0] + dx[i];
-                            int ny = currNode[1] + dy[i];
-
-                            int distance = Math.abs(nx - N) + Math.abs(ny - k);
-                            if (nx < 0 || nx >= N || ny < 0 || ny >= M || distance > D || visited[nx][ny])
-                                continue;
-
-                            visited[nx][ny] = true;
-                            q.offer(new int[]{nx, ny});
-                        }
-                    }
-
+            // 각 궁수가 공격할 적 찾기
+            for (int archerCol : archers) {
+                int[] target = findTarget(map, archerCol);
+                if (target != null) {
+                    targets.add(target);
                 }
             }
 
-            for (int[] enemy : attacked) {
-                if (curr[enemy[0]][enemy[1]]) {
-                    remain--;
-                    dead++;
-                    curr[enemy[0]][enemy[1]] = false;
+            for (int[] enemy : targets) {
+                if (map[enemy[0]][enemy[1]] == 1) {
+                    killCount++;
+                    map[enemy[0]][enemy[1]] = 0;
                 }
             }
 
-            if (remain <= 0) break;
+            // 적 이동 (아래로 한 칸)
+            moveEnemies(map);
+        }
 
-            // 적 이동
-            for (int i = N - 1; i >= 0; i--) {
-                for (int j = 0; j < M; j++) {
-                    if (curr[i][j]) {
-                        // 맨 끝이면 게임에서 제외
-                        if (i == N - 1) {
-                            curr[i][j] = false;
-                            remain--;
-                            continue;
+        return killCount;
+    }
+
+    // 궁수 위치에서 공격할 적 찾기 (거리 우선, 같으면 왼쪽 우선)
+    static int[] findTarget(int[][] map, int archerCol) {
+        for (int dist = 1; dist <= D; dist++) {
+            for (int col = 0; col < M; col++) {  // 왼쪽부터 탐색
+                for (int row = N - 1; row >= 0; row--) {
+                    if (map[row][col] == 1) {
+                        int distance = Math.abs(N - row) + Math.abs(archerCol - col);
+                        if (distance == dist) {
+                            return new int[]{row, col};
                         }
-
-                        curr[i + 1][j] = true;
-                        curr[i][j] = false;
                     }
                 }
             }
-
         }
 
-        return dead;
+        return null;
+    }
+
+    static void moveEnemies(int[][] map) {
+        for (int i = N - 1; i >= 0; i--) {
+            for (int j = 0; j < M; j++) {
+                if (i == N - 1) {
+                    map[i][j] = 0;  // 마지막 행은 제거
+                } else if (map[i][j] == 1) {
+                    map[i + 1][j] = 1;
+                    map[i][j] = 0;
+                }
+            }
+        }
     }
 }
