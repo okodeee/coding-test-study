@@ -1,20 +1,19 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
     static List<Integer>[] tree;
-    static boolean[] visited;
+    static boolean[] isLeaf;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
         int N = Integer.parseInt(st.nextToken());
-        int W = Integer.parseInt(st.nextToken());
+        double W = Integer.parseInt(st.nextToken());
 
         tree = new ArrayList[N + 1];
-        for (int i = 1; i <= N; i++) {
+        for (int i = 0; i <= N; i++) {
             tree[i] = new ArrayList<>();
         }
 
@@ -27,42 +26,38 @@ public class Main {
             tree[v].add(u);
         }
 
-        int leafCount = countLeaf(N);
+        // 리프 구하기
+        isLeaf = new boolean[N + 1];
+        Arrays.fill(isLeaf, true);
+        getLeaf(1);
 
-        System.out.println((double)W / leafCount);
+        // 정점에 쌓인 물의 양 평균 구하기
+        int leaf = 0;
+        for (int i = 2; i <= N; i++) {
+            if (!isLeaf[i]) continue;
+            leaf++;
+        }
+
+        System.out.println(W / leaf);
     }
 
-    static int countLeaf(int N) {
-        boolean[] visited = new boolean[N + 1];
-        Queue<Integer> queue = new LinkedList<>();
+    static void getLeaf(int s) {
+        Queue<Integer> q = new PriorityQueue<>();
+        boolean[] visited = new boolean[isLeaf.length];
 
-        queue.offer(1);
-        visited[1] = true;
+        visited[s] = true;
+        q.offer(s);
 
-        int leafCount = 0;
+        while(!q.isEmpty()) {
+            int curr = q.poll();
 
-        while (!queue.isEmpty()) {
-            int node = queue.poll();
-            int childCount = 0;
-
-            for (int child : tree[node]) {
-                if (!visited[child]) {
-                    visited[child] = true;
-                    queue.offer(child);
-                    childCount++;
+            for (int next : tree[curr]) {
+                if (!visited[next]) {
+                    isLeaf[curr] = false;
+                    visited[next] = true;
+                    q.offer(next);
                 }
             }
-
-            // 루트가 아니고 자식이 없으면 리프 노드
-            if (node != 1 && childCount == 0) {
-                leafCount++;
-            }
         }
-        
-        if (leafCount == 0) {
-            leafCount = 1;
-        }
-
-        return leafCount;
     }
 }
