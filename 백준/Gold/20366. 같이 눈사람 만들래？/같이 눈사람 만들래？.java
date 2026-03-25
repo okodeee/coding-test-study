@@ -1,26 +1,23 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
+        int[] snow = new int[N];
 
-        int[] snowballs = new int[N];
         StringTokenizer st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
-            snowballs[i] = Integer.parseInt(st.nextToken());
+            snow[i] = Integer.parseInt(st.nextToken());
         }
 
-        Arrays.sort(snowballs);
-
+        Arrays.sort(snow);
         int result = Integer.MAX_VALUE;
 
-        // 첫 번째 눈사람을 고정 (i, j)
-        for (int i = 0; i < N - 1; i++) {
+        for (int i = 0; i < N; i++) {
             for (int j = i + 1; j < N; j++) {
-                int snowman1 = snowballs[i] + snowballs[j];
+                int snowman1 = snow[i] + snow[j];
 
                 // 두 번째 눈사람을 투포인터로 찾기
                 int left = 0;
@@ -37,7 +34,7 @@ public class Main {
                         continue;
                     }
 
-                    int snowman2 = snowballs[left] + snowballs[right];
+                    int snowman2 = snow[left] + snow[right];
 
                     result = Math.min(Math.abs(snowman1 - snowman2), result);
 
