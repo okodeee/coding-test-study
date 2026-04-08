@@ -1,37 +1,29 @@
 import java.io.*;
+import java.util.*;
 
-/*
- * LCS (최장 공통 부분 수열)
- * if (Xi == Yj), LCS(Xi, Yi) = LCS(Xi-1, Yi-1) + 1
- * if (Xi != Yj), LCS(Xi, Yi) = max(LCS(Xi-1, Yj), LCS(Xi, Yj-1))
- */
 public class Main {
-    // Integer 배열은 null로 초기화
-    static Integer[][] dp;
-    static String str1, str2;
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        str1 = br.readLine();
-        str2 = br.readLine();
+        String str1 = br.readLine();
+        String str2 = br.readLine();
 
-        dp = new Integer[str1.length()][str2.length()];
+        int length1 = str1.length();
+        int length2 = str2.length();
 
-        System.out.println(lcs(str1.length() - 1, str2.length() - 1));
-    }
+        int[][] dp = new int[length1 + 1][length2 + 1];
 
-    public static int lcs(int x, int y) {
-        if (x < 0 || y < 0)
-            return 0;
-        if (dp[x][y] == null) {
-            if (str1.charAt(x) == str2.charAt(y)) {
-                dp[x][y] = lcs(x - 1, y - 1) + 1;
-            } else {
-                dp[x][y] = Math.max(lcs(x - 1, y), lcs(x, y - 1));
+        for (int i = 1; i <= length1; i++) {
+            for (int j = 1; j <= length2; j++) {
+                if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i][j - 1], dp[i - 1][j]);
+                }
+
             }
         }
 
-        return dp[x][y];
+        System.out.println(dp[length1][length2]);
     }
 }
