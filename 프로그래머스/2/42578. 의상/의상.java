@@ -3,18 +3,18 @@ import java.util.*;
 class Solution {
     public int solution(String[][] clothes) {
         
-        HashMap<String, Integer> map = new HashMap<>();
+        // <의상의 종류, 항목 수>
+        Map<String, Integer> cnt = new HashMap<>();
         
-        for (int i = 0; i < clothes.length; i++) {
-            map.put(clothes[i][1], map.getOrDefault(clothes[i][1], 0) + 1);
+        for (String[] cloth : clothes) {
+            cnt.put(cloth[1], cnt.getOrDefault(cloth[1], 0) + 1);
         }
         
-        Collection<Integer> values = map.values();
         int answer = 1;
-        for (int e : values) {
-            answer *= e + 1;
+        for (String key : cnt.keySet()) {
+            answer *= cnt.get(key) + 1;
         }
         
-        return answer - 1;
+        return answer - 1;  // 아무것도 안 입은 상태 제외
     }
 }
