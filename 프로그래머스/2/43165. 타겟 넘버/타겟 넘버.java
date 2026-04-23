@@ -1,19 +1,27 @@
-class Solution {  
-    int answer = 0;  
-  
-    public int solution(int[] numbers, int target) {  
-        dfs(0, numbers, target, 0);  
-        return answer;  
-    }  
-  
-    private void dfs(int depth, int[] numbers, int target, int sum) {  
-        if (depth == numbers.length) {  
-            if (sum == target) {  
-                answer++;  
-            }  
-            return;  
+class Solution {
+    int answer = 0;
+    int length;
+    int[] numbers;
+    int target;
+    
+    public int solution(int[] numbers, int target) {
+        this.numbers = numbers;
+        this.target = target;
+        
+        length = numbers.length;
+        
+        dfs(0, 0);
+        
+        return answer;
+    }
+    
+    void dfs(int depth, int sum) {
+        if (depth == length) {
+            if (sum == target) answer++;
+            return;
         }
-        dfs(depth + 1, numbers, target, sum + numbers[depth]);  
-        dfs(depth + 1, numbers, target, sum - numbers[depth]);  
-    }  
+        
+        dfs(depth + 1, sum + numbers[depth]);
+        dfs(depth + 1, sum - numbers[depth]);
+    }
 }
