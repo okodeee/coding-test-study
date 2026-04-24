@@ -1,52 +1,51 @@
-import java.io.*;
 import java.util.*;
 
 class Solution {
     public int[] solution(int[] fees, String[] records) {
-        
-        // 1. 자동차 별 누적 주차 시간 계산
-        Map<Integer, Integer> timeSum = new HashMap<>();    // 누적 주차 시간
-        Map<Integer, Integer> startTime = new HashMap<>();  // 입차 시간('분' 단위)
-        
+        Map<String, Integer> totalTime = new HashMap<>();
+        Map<String, String> inTime = new HashMap<>(); // { 차량번호: 입차시간 }
+
         for (String record : records) {
-            String[] st = record.split(" ");
-            String[] time = st[0].split(":");
-            int hour = Integer.parseInt(time[0]);
-            int minute = Integer.parseInt(time[1]);
-            int carNum = Integer.parseInt(st[1]);
-            
-            // Java에서 ==는 객체의 주소를 비교하는 연산자
-            if (st[2].equals("IN")) {    // 입차 처리 (startTime에 입차 시간 저장)
-                startTime.put(carNum, hour * 60 + minute);
-            } else {    // 출차 처리 (startTime 입차 시간과 출차 시간 계산해서 누적 값 처리)
-                timeSum.put(carNum, timeSum.getOrDefault(carNum, 0) + hour * 60 + minute - startTime.get(carNum));
-                startTime.remove(carNum);
-            }
-        }
-        
-        // 1-1. 어떤 차량이 입차된 후에 출차된 내역이 없다면, 23:59에 출차된 것으로 간주
-        for(int carNum : startTime.keySet()) {
-            timeSum.put(carNum, timeSum.getOrDefault(carNum, 0) + 23 * 60 + 59 - startTime.get(carNum));
-        }
-        
-        // 2. 자동차 별 주차 요금 계산
-        List<Integer> cars = new ArrayList<>(timeSum.keySet());
-        Collections.sort(cars);
-        
-        int[] answer = new int[cars.size()];
-        int cumulativeTime = 0;
-        for (int i = 0; i < cars.size(); i++) {
-            cumulativeTime = timeSum.get(cars.get(i));
-            if (fees[0] > cumulativeTime) {
-                answer[i] = fees[1];
+            String[] parts = record.split(" ");
+            String time = parts[0];
+            String num = parts[1];
+            String type = parts[2];
+
+            if (type.equals("IN")) {
+                inTime.put(num, time);
             } else {
-                answer[i] = fees[1];
-                cumulativeTime -= fees[0];
-                answer[i] += (cumulativeTime / fees[2] * fees[3]);
-                if (cumulativeTime % fees[2] > 0) answer[i] += fees[3];
+                totalTime.put(num, totalTime.getOrDefault(num, 0) + calcTime(inTime.get(num), time));
+                inTime.remove(num);
             }
         }
-        
+
+        // 미출차 차량 23:59로 처리
+        for (String num : inTime.keySet()) {
+            totalTime.put(num, totalTime.getOrDefault(num, 0) + calcTime(inTime.get(num), "23:59"));
+        }
+
+        // 차량번호 오름차순 정렬 후 요금 계산
+        List<String> carNums = new ArrayList<>(totalTime.keySet());
+        Collections.sort(carNums);
+
+        int[] answer = new int[carNums.size()];
+        for (int i = 0; i < carNums.size(); i++) {
+            answer[i] = calcFee(fees, totalTime.get(carNums.get(i)));
+        }
+
         return answer;
+    }
+
+    // 두 시각 사이 분 계산
+    int calcTime(String in, String out) {
+        int inM = Integer.parseInt(in.substring(0, 2)) * 60 + Integer.parseInt(in.substring(3, 5));
+        int outM = Integer.parseInt(out.substring(0, 2)) * 60 + Integer.parseInt(out.substring(3, 5));
+        return outM - inM;
+    }
+
+    // 요금 계산
+    int calcFee(int[] fees, int time) {
+        if (time <= fees[0]) return fees[1];
+        return fees[1] + (int) Math.ceil((double)(time - fees[0]) / fees[2]) * fees[3];
     }
 }
