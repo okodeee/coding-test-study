@@ -17,10 +17,8 @@ public class Main {
 
         int answer = 0;
         for (int i = N-1; i >= 0; i--) {
-            int v = K / coins[i];
-            answer += v;
-
-            K -= v * coins[i];
+            answer += K / coins[i];
+            K %= coins[i];
         }
 
         System.out.println(answer);
