@@ -1,44 +1,53 @@
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 
 public class Main {
-    public static final int MAX_N = 100000;
-    
-    public static int n, m;
-    public static int[] uf = new int[MAX_N + 1];
-    
-    public static int find(int x) {
-        if(uf[x] == x)
-            return x;
+    static int N, M;
+    static int[] uf;
+
+    static int find(int x) {
+
+        if (uf[x] == x) return x;
+        
         return uf[x] = find(uf[x]);
     }
-    
-    public static void union(int x, int y) {
+
+    static void union(int x, int y) {
         int X = find(x);
         int Y = find(y);
+
         uf[X] = Y;
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        n = sc.nextInt();
-        m = sc.nextInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
 
-        for(int i = 1; i <= n; i++)
+        uf = new int[N+1];
+        for (int i = 1; i <= N; i++) {
             uf[i] = i;
+        }
 
-        while(m-- > 0) {
-            int qType = sc.nextInt();
-            int a = sc.nextInt();
-            int b = sc.nextInt();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
+            int op = Integer.parseInt(st.nextToken());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
 
-            if(qType == 0)
+            if (op == 0) {
                 union(a, b);
-            else {
-                if(find(a) == find(b))
-                    System.out.println(1);
-                else
-                    System.out.println(0);
+            } else {
+                if (find(a) == find(b)) {
+                    sb.append(1).append("\n");
+                } else {
+                    sb.append(0).append("\n");
+                }
             }
         }
+
+        System.out.println(sb);
     }
 }
