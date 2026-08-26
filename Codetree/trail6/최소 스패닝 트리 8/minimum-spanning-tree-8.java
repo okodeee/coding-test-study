@@ -11,21 +11,23 @@ class Edge {
 }
 
 public class Main {
-    static List<Edge>[] graph;
+    static int N;
+    static int[][] graph;
     static int[] dist;
     static boolean[] visited;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
         int M = Integer.parseInt(st.nextToken());
 
         dist = new int[N+1];
         visited = new boolean[N+1];
-        graph = new ArrayList[N+1];
+        graph = new int[N+1][N+1];
+
         for (int i = 1; i <= N; i++) {
-            graph[i] = new ArrayList<>();
+            Arrays.fill(graph[i], 1001);
         }
 
         for (int i = 0; i < M; i++) {
@@ -34,8 +36,8 @@ public class Main {
             int v = Integer.parseInt(st.nextToken());
             int w = Integer.parseInt(st.nextToken());
             
-            graph[u].add(new Edge(v, w));
-            graph[v].add(new Edge(u, w));
+            graph[u][v] = Math.min(graph[u][v], w);
+            graph[v][u] = Math.min(graph[v][u], w);
         }
 
         for (int i = 1; i <= N; i++) {
@@ -47,26 +49,30 @@ public class Main {
     }
 
     static void prim(int s) {
-        PriorityQueue<Edge> pq = new PriorityQueue<>((o1, o2) -> o1.w - o2.w);
-        pq.offer(new Edge(s, 0));
 
         long answer = 0;
 
-        while (!pq.isEmpty()) {
-            Edge curr = pq.poll();
+        for (int i = 1; i <= N; i++) {
 
-            if (visited[curr.n]) continue;
+            int minIndex = -1;
 
-            visited[curr.n] = true;
-            answer += curr.w;
+            for (int j = 1; j <= N; j++) {
+                if (visited[j]) continue;
 
-            for (Edge next : graph[curr.n]) {
-                if (visited[next.n]) continue;
-
-                if (next.w < dist[next.n]) {
-                    dist[next.n] = next.w; 
-                    pq.offer(new Edge(next.n, next.w));
+                if (minIndex == -1 || dist[minIndex] > dist[j]) {
+                    minIndex = j;
                 }
+            }
+
+            visited[minIndex] = true;
+
+            answer += dist[minIndex];
+
+            for (int j = 1; j <= N; j++) {
+                if(graph[minIndex][j] == 0)
+                    continue;
+
+                dist[j] = Math.min(dist[j], graph[minIndex][j]);
             }
         }
 
