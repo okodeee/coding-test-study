@@ -2,12 +2,11 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-    static int[] dx1 = new int[] { -2, -1, 1, 2 };
-    static int[] dy1 = new int[] { 0, 0, 0, 0 };
-    static int[] dx2 = new int[] { -1, 0, 0, 1 };
-    static int[] dy2 = new int[] { 0, -1, 1, 0 };
-    static int[] dx3 = new int[] { -1, -1, 1, 1 };
-    static int[] dy3 = new int[] { -1, 1, -1, 1 };
+    static int[][][] bombDirections = {
+        { {-2, 0}, {-1, 0}, {1, 0}, {2, 0} }, // 세로 폭탄
+        { {-1, 0}, {0, -1}, {0, 1}, {1, 0} }, // 십자 폭탄
+        { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} } // X자 폭탄
+    };
     static int N;
     static int bomb;
     static List<int[]> position = new ArrayList<>();
@@ -32,6 +31,7 @@ public class Main {
             }
         }
 
+        isExploded = new boolean[N + 1][N + 1];
         backtracking(0, new int[bomb] );
 
         System.out.println(answer);
@@ -43,52 +43,31 @@ public class Main {
             return;
         }
 
-        s[d] = 1;
-        backtracking(d+1, s);
-
-        s[d] = 2;
-        backtracking(d+1, s);
-
-        s[d] = 3;
-        backtracking(d+1, s);
+        for (int type = 0; type < 3; type++) {
+            s[d] = type;
+            backtracking(d + 1, s);
+        }
     }
 
     static void calculate(int[] s) {
-        isExploded = new boolean[N+1][N+1];
+        for (int i = 1; i <= N; i++) {
+            Arrays.fill(isExploded[i], false);
+        }
+
         for (int i = 0; i < s.length; i++) {
             int[] c = position.get(i);
             int x = c[0];
             int y = c[1];
+            int bombType = s[i];
 
             isExploded[x][y] = true;
 
-            if (s[i] == 1) {
-                for (int j = 0; j < 4; j++) {
-                    int nx = x + dx1[j];
-                    int ny = y + dy1[j];
+            for (int[] dir : bombDirections[bombType]) {
+                int nx = x + dir[0];
+                int ny = y + dir[1];
 
-                    if (nx <= 0 || nx > N || ny <= 0 || ny > N) continue;
-
-                    isExploded[nx][ny] = true;
-                }   
-            } else if (s[i] == 2) {
-                for (int j = 0; j < 4; j++) {
-                    int nx = x + dx2[j];
-                    int ny = y + dy2[j];
-
-                    if (nx <= 0 || nx > N || ny <= 0 || ny > N) continue;
-
-                    isExploded[nx][ny] = true;
-                }   
-            } else if (s[i] == 3) {
-                for (int j = 0; j < 4; j++) {
-                    int nx = x + dx3[j];
-                    int ny = y + dy3[j];
-
-                    if (nx <= 0 || nx > N || ny <= 0 || ny > N) continue;
-
-                    isExploded[nx][ny] = true;
-                }   
+                if (nx <= 0 || nx > N || ny <= 0 || ny > N) continue;
+                isExploded[nx][ny] = true;
             }
         }
 
