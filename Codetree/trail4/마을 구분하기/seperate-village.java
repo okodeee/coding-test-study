@@ -25,7 +25,7 @@ public class Main {
                 if (!visited[i][j] && grid[i][j] == 1) {
                     people = 0;
                     village++;
-                    dfs(i, j);
+                    DFS(i, j);
                     num.add(people);
                 }
             }
@@ -41,7 +41,7 @@ public class Main {
         System.out.println(sb);
     }
 
-    static void dfs(int x, int y) {
+    static void DFS(int x, int y) {
         visited[x][y] = true;
         people++;
 
@@ -51,7 +51,7 @@ public class Main {
 
             if (nx < 0 || nx >= n || ny < 0 || ny >= n || visited[nx][ny] || grid[nx][ny] == 0) continue;
 
-            dfs(nx, ny);
+            DFS(nx, ny);
         }
     }
 }
